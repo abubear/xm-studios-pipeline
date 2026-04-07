@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 40" fill="none">
+  <rect width="80" height="40" rx="4" fill="#1a1a1a"/>
+  <text x="40" y="18" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="10" fill="#FFE81F">STAR</text>
+  <text x="40" y="32" text-anchor="middle" font-family="Arial, sans-serif" font-weight="700" font-size="12" fill="#FFE81F">WARS</text>
+</svg>
