@@ -2,9 +2,12 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { DEMO_MODE } from "@/lib/demo";
 import type { UserRole } from "@/types/database";
 
 async function assertAdmin() {
+  if (DEMO_MODE) return null;
+
   const supabase = createClient();
   const {
     data: { user },
@@ -24,6 +27,7 @@ async function assertAdmin() {
 
 export async function updateUserRole(userId: string, role: UserRole) {
   const supabase = await assertAdmin();
+  if (!supabase) { revalidatePath("/admin"); return; }
   const { error } = await supabase
     .from("profiles")
     .update({ role } as never)
@@ -34,6 +38,7 @@ export async function updateUserRole(userId: string, role: UserRole) {
 
 export async function toggleStyleRule(ruleId: string, isActive: boolean) {
   const supabase = await assertAdmin();
+  if (!supabase) { revalidatePath("/admin"); return; }
   const { error } = await supabase
     .from("style_guide_rules")
     .update({ is_active: isActive } as never)

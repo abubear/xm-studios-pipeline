@@ -110,6 +110,7 @@ export function ExpandedCard({
         });
         setVoters(mapped);
       });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [image?.id, image?.approve_count, image?.reject_count]);
 
   if (!image) return null;

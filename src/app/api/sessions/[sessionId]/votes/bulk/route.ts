@@ -1,10 +1,16 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
+import { DEMO_MODE } from "@/lib/demo";
 
 export async function POST(
   request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) {
+    const body = await request.json();
+    return NextResponse.json({ count: (body.generated_image_ids ?? []).length });
+  }
+
   const supabase = createAdminClient();
   const {
     data: { user },

@@ -5,7 +5,6 @@ import {
   Shield,
   Loader2,
   CheckCircle2,
-  XCircle,
   ArrowRight,
   BarChart3,
   Eye,
@@ -78,7 +77,7 @@ export function AutoFilterWorkspace({
     for (const check of FILTER_CHECKS) {
       setCurrentCheck(check.key);
       await new Promise((r) => setTimeout(r, 1500));
-      setCompletedChecks((prev) => new Set([...prev, check.key]));
+      setCompletedChecks((prev) => new Set(Array.from(prev).concat(check.key)));
     }
     setCurrentCheck(null);
 

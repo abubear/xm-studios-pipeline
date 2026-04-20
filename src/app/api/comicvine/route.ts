@@ -27,12 +27,45 @@ export interface ComicVineImage {
   resource_type: string;
 }
 
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
+function makeDemoResults(query: string, count = 12) {
+  return Array.from({ length: count }, (_, i) => ({
+    id: i + 1,
+    name: `${query} — Issue ${i + 1}`,
+    image: {
+      icon_url: `https://picsum.photos/seed/${query}${i}/64/64`,
+      medium_url: `https://picsum.photos/seed/${query}${i}/300/450`,
+      screen_url: `https://picsum.photos/seed/${query}${i}/640/480`,
+      screen_large_url: `https://picsum.photos/seed/${query}${i}/1280/960`,
+      small_url: `https://picsum.photos/seed/${query}${i}/120/180`,
+      super_url: `https://picsum.photos/seed/${query}${i}/600/900`,
+      thumb_url: `https://picsum.photos/seed/${query}${i}/96/144`,
+      tiny_url: `https://picsum.photos/seed/${query}${i}/32/48`,
+      original_url: `https://picsum.photos/seed/${query}${i}/600/900`,
+    },
+    deck: `Demo reference for ${query}`,
+    description: null,
+    resource_type: "issue",
+  }));
+}
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("query");
   const resource = searchParams.get("resource") || "characters";
   const page = parseInt(searchParams.get("page") || "1");
   const limit = parseInt(searchParams.get("limit") || "20");
+
+  if (DEMO_MODE && query) {
+    return NextResponse.json({
+      results: makeDemoResults(query),
+      total: 12,
+      page,
+      limit,
+      offset: (page - 1) * limit,
+    });
+  }
 
   if (!query) {
     return NextResponse.json({ error: "Query is required" }, { status: 400 });

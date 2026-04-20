@@ -2,16 +2,40 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { TopBar } from "@/components/layout/top-bar";
 import { AdminDashboard } from "@/components/admin/admin-dashboard";
+import {
+  DEMO_MODE,
+  DEMO_USER_ID,
+  DEMO_PROFILE,
+  DEMO_IP_ROSTER,
+  DEMO_STYLE_RULES,
+  DEMO_STATS,
+} from "@/lib/demo";
 import type { Profile, IPRoster, StyleGuideRule } from "@/types/database";
 
 export default async function AdminPage() {
+  if (DEMO_MODE) {
+    return (
+      <div>
+        <TopBar title="Admin Panel" />
+        <div className="p-8">
+          <AdminDashboard
+            currentUserId={DEMO_USER_ID}
+            users={[DEMO_PROFILE] as Profile[]}
+            ipRoster={DEMO_IP_ROSTER as IPRoster[]}
+            styleRules={DEMO_STYLE_RULES as StyleGuideRule[]}
+            stats={DEMO_STATS}
+          />
+        </div>
+      </div>
+    );
+  }
+
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  // Role guard — admin only
   const { data: rawCurrentProfile, error: profileError } = await supabase
     .from("profiles")
     .select("role")
@@ -21,7 +45,6 @@ export default async function AdminPage() {
   const currentProfile = rawCurrentProfile as { role: string } | null;
   if (currentProfile?.role !== "admin") redirect("/dashboard");
 
-  // Fetch all data in parallel
   const [
     { data: users, error: usersError },
     { data: ipRoster, error: ipError },

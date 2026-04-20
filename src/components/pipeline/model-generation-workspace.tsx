@@ -32,13 +32,13 @@ type Stage = "idle" | "generating-3d" | "3d-complete" | "rigging" | "complete";
 
 export function ModelGenerationWorkspace({
   sessionId,
-  characterName,
+  characterName: _characterName, // eslint-disable-line @typescript-eslint/no-unused-vars
   frontViewUrl,
   topViewUrl,
 }: ModelGenerationWorkspaceProps) {
   const [stage, setStage] = useState<Stage>("idle");
   const [modelUrl, setModelUrl] = useState<string | null>(null);
-  const [riggedModelUrl, setRiggedModelUrl] = useState<string | null>(null);
+  const [, setRiggedModelUrl] = useState<string | null>(null);
 
   const trellis = useWorkflowProgress();
   const rigging = useWorkflowProgress();

@@ -1,7 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
+import { DEMO_MODE, DEMO_SESSIONS, DEMO_USER_ID } from "@/lib/demo";
 
 export async function GET() {
+  if (DEMO_MODE) return NextResponse.json(DEMO_SESSIONS);
+
   const supabase = createAdminClient();
   const {
     data: { user },
@@ -18,6 +21,24 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (DEMO_MODE) {
+    const body = await request.json();
+    const { ip_roster_id, name } = body;
+    const newSession = {
+      id: `demo-session-${Date.now()}`,
+      ip_roster_id,
+      name,
+      stage: 0,
+      status: "draft",
+      config: {},
+      created_by: DEMO_USER_ID,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      ip_roster: DEMO_SESSIONS[0].ip_roster,
+    };
+    return NextResponse.json(newSession, { status: 201 });
+  }
+
   const supabase = createAdminClient();
   const {
     data: { user },

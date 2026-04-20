@@ -1,7 +1,21 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextRequest, NextResponse } from "next/server";
+import { DEMO_MODE, DEMO_MODELS } from "@/lib/demo";
 
 export async function GET(request: NextRequest) {
+  if (DEMO_MODE) {
+    const { searchParams } = new URL(request.url);
+    const search = searchParams.get("search") || "";
+    let results = DEMO_MODELS;
+    if (search) {
+      results = DEMO_MODELS.filter((m) =>
+        m.name.toLowerCase().includes(search.toLowerCase()) ||
+        m.character_name.toLowerCase().includes(search.toLowerCase())
+      );
+    }
+    return NextResponse.json(results);
+  }
+
   const supabase = createAdminClient();
   const { searchParams } = new URL(request.url);
 

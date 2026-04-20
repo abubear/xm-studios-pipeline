@@ -3,6 +3,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
 import { useJuryStore } from "./use-jury-store";
 
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
+
 export function useJuryRealtime(sessionId: string, imageIds: string[]) {
   const queryClient = useQueryClient();
   const addActivity = useJuryStore((s) => s.addActivity);
@@ -14,7 +16,7 @@ export function useJuryRealtime(sessionId: string, imageIds: string[]) {
   }, [imageIds]);
 
   useEffect(() => {
-    if (!sessionId) return;
+    if (!sessionId || DEMO_MODE) return;
 
     const supabase = createClient();
     const channel = supabase

@@ -1,8 +1,17 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
+import { DEMO_MODE, DEMO_PROFILE } from "@/lib/demo";
 
 export default async function DashboardPage() {
+  if (DEMO_MODE) {
+    return (
+      <div className="p-8">
+        <DashboardContent firstName={DEMO_PROFILE.full_name.split(" ")[0]} />
+      </div>
+    );
+  }
+
   const supabase = createClient();
   const {
     data: { user },

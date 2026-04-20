@@ -1,10 +1,29 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
+import { DEMO_MODE } from "@/lib/demo";
 
 export async function GET(
   _request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) {
+    return NextResponse.json(
+      Array.from({ length: 6 }, (_, i) => ({
+        id: `demo-ref-${String(i + 1).padStart(3, "0")}`,
+        session_id: params.sessionId,
+        url: `https://picsum.photos/seed/ref${i + 10}/600/900`,
+        source: "comicvine",
+        source_id: `demo-${i}`,
+        caption: `Reference ${i + 1}`,
+        tags: ["marvel", "iron man"],
+        width: 600,
+        height: 900,
+        metadata: {},
+        created_by: "demo-user-001",
+        created_at: "2026-01-01T00:00:00Z",
+      }))
+    );
+  }
   const supabase = createAdminClient();
 
   const { data, error } = await supabase
@@ -23,6 +42,13 @@ export async function POST(
   request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) {
+    const body = await request.json();
+    return NextResponse.json(
+      { id: `demo-ref-new`, session_id: params.sessionId, ...body, created_at: new Date().toISOString() },
+      { status: 201 }
+    );
+  }
   const supabase = createAdminClient();
   const {
     data: { user },
@@ -68,6 +94,7 @@ export async function DELETE(
   request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) return NextResponse.json({ success: true });
   const supabase = createAdminClient();
   const {
     data: { user },

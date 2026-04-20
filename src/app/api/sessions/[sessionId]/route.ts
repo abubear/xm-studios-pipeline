@@ -1,10 +1,16 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
+import { DEMO_MODE, DEMO_SESSIONS } from "@/lib/demo";
 
 export async function GET(
   _request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) {
+    const session = DEMO_SESSIONS.find((s) => s.id === params.sessionId) ?? DEMO_SESSIONS[0];
+    return NextResponse.json(session);
+  }
+
   const supabase = createAdminClient();
   const {
     data: { user },
@@ -27,6 +33,12 @@ export async function PATCH(
   request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) {
+    const body = await request.json();
+    const session = DEMO_SESSIONS.find((s) => s.id === params.sessionId) ?? DEMO_SESSIONS[0];
+    return NextResponse.json({ ...session, ...body });
+  }
+
   const supabase = createAdminClient();
   const {
     data: { user },

@@ -1,10 +1,22 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import { NextResponse } from "next/server";
+import { DEMO_MODE } from "@/lib/demo";
 
 export async function POST(
   request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) {
+    const body = await request.json();
+    const { generated_image_id, vote } = body;
+    return NextResponse.json({
+      generated_image_id,
+      approve_count: vote === "approve" ? 1 : 0,
+      reject_count: vote === "reject" ? 1 : 0,
+      my_vote: vote,
+    });
+  }
+
   const supabase = createAdminClient();
   const {
     data: { user },
@@ -19,7 +31,6 @@ export async function POST(
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  // Verify image belongs to session
   const { data: image } = await supabase
     .from("generated_images")
     .select("id")
@@ -30,7 +41,6 @@ export async function POST(
   if (!image)
     return NextResponse.json({ error: "Image not found" }, { status: 404 });
 
-  // Upsert vote
   const { data: existingVote } = await supabase
     .from("votes")
     .select("id")
@@ -53,7 +63,6 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  // Return updated counts
   const { data: votes } = await supabase
     .from("votes")
     .select("vote")
@@ -74,6 +83,16 @@ export async function DELETE(
   request: Request,
   { params }: { params: { sessionId: string } }
 ) {
+  if (DEMO_MODE) {
+    const body = await request.json();
+    return NextResponse.json({
+      generated_image_id: body.generated_image_id,
+      approve_count: 0,
+      reject_count: 0,
+      my_vote: null,
+    });
+  }
+
   const supabase = createAdminClient();
   const {
     data: { user },
@@ -84,7 +103,6 @@ export async function DELETE(
   const body = await request.json();
   const { generated_image_id } = body;
 
-  // Verify image belongs to session
   const { data: image } = await supabase
     .from("generated_images")
     .select("id")
@@ -104,7 +122,6 @@ export async function DELETE(
   if (error)
     return NextResponse.json({ error: error.message }, { status: 500 });
 
-  // Return updated counts
   const { data: votes } = await supabase
     .from("votes")
     .select("vote")

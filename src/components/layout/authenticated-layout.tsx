@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AppShell } from "./app-shell";
+import { DEMO_MODE, DEMO_PROFILE } from "@/lib/demo";
 import type { Profile } from "@/types/database";
 
 export async function AuthenticatedLayout({
@@ -8,6 +9,11 @@ export async function AuthenticatedLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // In demo mode serve a mock admin profile so every section renders
+  if (DEMO_MODE) {
+    return <AppShell profile={DEMO_PROFILE}>{children}</AppShell>;
+  }
+
   try {
     const supabase = createClient();
     const {
@@ -27,7 +33,6 @@ export async function AuthenticatedLayout({
 
     return <AppShell profile={profile as Profile}>{children}</AppShell>;
   } catch (err) {
-    // Re-throw Next.js redirect/notFound signals
     if (
       err instanceof Error &&
       (err.message === "NEXT_REDIRECT" || err.message === "NEXT_NOT_FOUND")

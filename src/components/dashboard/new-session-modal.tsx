@@ -6,7 +6,10 @@ import { X, Search, AlertTriangle, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { useCreateSession } from "@/hooks/use-sessions";
+import { DEMO_IP_ROSTER } from "@/lib/demo";
 import type { IPRoster } from "@/types/database";
+
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 interface NewSessionModalProps {
   open: boolean;
@@ -23,6 +26,11 @@ export function NewSessionModal({ open, onClose }: NewSessionModalProps) {
 
   useEffect(() => {
     if (!open) return;
+    if (DEMO_MODE) {
+      setCharacters(DEMO_IP_ROSTER as unknown as IPRoster[]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const supabase = createClient();
     supabase

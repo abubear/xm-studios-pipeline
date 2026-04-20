@@ -2,12 +2,37 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { TopBar } from "@/components/layout/top-bar";
 import { FactoryPackageWorkspace } from "@/components/pipeline/factory-package-workspace";
+import { DEMO_MODE, DEMO_SESSIONS, DEMO_SESSION_ID } from "@/lib/demo";
 
 export default async function FactoryPackagePage({
   params,
 }: {
   params: { sessionId: string };
 }) {
+  if (DEMO_MODE) {
+    const session =
+      DEMO_SESSIONS.find((s) => s.id === params.sessionId) ??
+      DEMO_SESSIONS.find((s) => s.id === DEMO_SESSION_ID)!;
+    return (
+      <div>
+        <TopBar title="Factory Package — Stage 13">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-zinc-500">{session.name}</span>
+            {session.ip_roster && (
+              <span className="px-2 py-0.5 bg-zinc-800 text-zinc-400 text-xs font-medium rounded-lg">
+                {session.ip_roster.universe}
+              </span>
+            )}
+          </div>
+        </TopBar>
+        <FactoryPackageWorkspace
+          sessionId={session.id}
+          characterName={session.ip_roster?.name}
+        />
+      </div>
+    );
+  }
+
   const supabase = createClient();
   const {
     data: { user },

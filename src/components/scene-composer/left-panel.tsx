@@ -6,6 +6,9 @@ import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import type { IPRoster } from "@/types/database";
 import { useSceneComposerStore } from "@/hooks/use-scene-composer-store";
+import { DEMO_IP_ROSTER } from "@/lib/demo";
+
+const DEMO_MODE = process.env.NEXT_PUBLIC_DEMO_MODE === "true";
 
 interface LeftPanelProps {
   sessionCharacterName?: string;
@@ -18,6 +21,11 @@ export function LeftPanel({ sessionCharacterName }: LeftPanelProps) {
   const { searchQuery, setSearchQuery } = useSceneComposerStore();
 
   useEffect(() => {
+    if (DEMO_MODE) {
+      setCharacters(DEMO_IP_ROSTER);
+      setLoading(false);
+      return;
+    }
     const supabase = createClient();
     supabase
       .from("ip_roster")

@@ -12,8 +12,6 @@ import {
   Search,
   Sparkles,
   Vote,
-  Trophy,
-  ShieldCheck,
   ShieldAlert,
   ClipboardCheck,
   RotateCcw,
